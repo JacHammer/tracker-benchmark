@@ -2,12 +2,12 @@
 
 OpenCV built-in tracker:
 
-Boosting  
-CSRT  
-GOTURN (requres pre-trained model)  
+Boosting 
+CSRT 
+GOTURN (requres pre-trained model) 
 KCF 
-MedianFlow  
-MILMOSSE  
+MedianFlow 
+MILMOSSE 
 TLD 
 
 
