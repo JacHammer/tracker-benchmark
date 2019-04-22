@@ -31,13 +31,23 @@ def BenchmarkingTracker(tracker, image_path, groundtruth_path, dataset_type):
     
     # TODO: prepare file to write stats
     # f_to_write = open('test', 'a')
-
+    n_image = len(images)
+    sum_iou = 0.
+    sum_fps = 0.
     for image in images:
+        
         # get width and height of images
         (H, W) = image.shape[:2]
         # read bbox shape and convert it to tuple
         coord = images_coordinates.readline().rstrip()
-        coord = coord.split(",")
+        if coord.isspace() == True:
+            break
+        
+        if ',' in coord:
+            coord = coord.split(",")
+        else:
+            coord = coord.split()
+            
         coord = tuple(coord)
         coord = tuple([int(v_ref) for v_ref in coord])
 
@@ -51,14 +61,16 @@ def BenchmarkingTracker(tracker, image_path, groundtruth_path, dataset_type):
             cv2.rectangle(image, (x, y), (x + w, y + h),(0, 255, 0), 2)
             cv2.rectangle(image, (ref_x, ref_y), (ref_x + ref_w, ref_y + ref_h),(0, 0, 0), 2)
             iou = ComputeIOU((x, y, x+w, y+h), (ref_x, ref_y, ref_x + ref_w, ref_y + ref_h))
-            print(iou)
+            sum_iou = sum_iou + iou
         else:
             print("tracking failed: code: " + str(success))
             iou = 0.
+            sum_iou = sum_iou + iou
 
         # update FPS    
         fps.update()
         fps.stop()
+        sum_fps = sum_fps + fps.fps()
 
         info = [
             ("IOU", "{:.2f}".format(iou)),
@@ -85,7 +97,7 @@ def BenchmarkingTracker(tracker, image_path, groundtruth_path, dataset_type):
     # write stats to file
     # f_to_write.write()
     cv2.destroyAllWindows()
-    return 
+    return [sum_fps/n_image, sum_iou/n_image]
 
 '''
 TODO for benchmarking procedures:
@@ -96,9 +108,3 @@ for tracker in list_of_trackers:
 
 '''
 
-
-tracker = cv2.TrackerCSRT_create()
-image_path = 'dataset/VTB/Basketball/Basketball/img/*jpg'
-groundtruth_path = "dataset/VTB/Basketball/Basketball/groundtruth_rect.txt"
-
-result = BenchmarkingTracker(tracker, image_path, groundtruth_path, "idk")
