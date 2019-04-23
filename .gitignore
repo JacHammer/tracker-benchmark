@@ -134,3 +134,4 @@ dmypy.json
 
 # notepad++ backup file
 *nppBackup/
+*.bak
