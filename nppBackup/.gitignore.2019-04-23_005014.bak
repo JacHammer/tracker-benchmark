@@ -126,6 +126,7 @@ dmypy.json
 /dataset
 *.zip
 *.jpg
+*.png
 *.mp4
 
 # model for goturn tracker
@@ -133,4 +134,4 @@ dmypy.json
 *.caffemodel
 
 # notepad++ backup file
-*/nppBackup
+/nppBackup

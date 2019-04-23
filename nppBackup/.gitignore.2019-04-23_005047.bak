@@ -133,4 +133,4 @@ dmypy.json
 *.caffemodel
 
 # notepad++ backup file
-*/nppBackup
+/nppBackup
