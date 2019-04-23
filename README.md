@@ -4,14 +4,9 @@ OpenCV built-in tracker:
 
 Boosting  
 CSRT  
-GOTURN (requres pre-trained model)  
+~~GOTURN (requres pre-trained model)~~ not been benchmarked due to memory leak  
 KCF  
 MedianFlow  
 MIL  
 MOSSE  
 TLD  
-
-
-Third party tracker used: 
-
-[SiamFC](https://github.com/bilylee/SiamFC-TensorFlow "SiamFC") based on the [paper](https://www.robots.ox.ac.uk/~luca/siamese-fc.html "SiamFC") here.    
