@@ -4,6 +4,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
+# this function takes an attribute such as iv, occ etc.
+# and returns a list of sub-dataset names related to the attribute
 def returnSubsetList(attributes):
     available_dataset = ['Basketball', 'Biker', 'Bird1', 'Bird2', 'BlurBody', 'BlurCar1', 
                          'BlurCar2', 'BlurCar3', 'BlurCar4', 'BlurFace', 'BlurOwl', 'Board', 
@@ -111,7 +113,9 @@ def returnSubsetList(attributes):
         return l         
     else:
         return []
-    
+# batch_results_df: existing data frame
+# tracker: name of a tracker, string
+# attributes: one of occ, iv, etc.
 def getSubCategoryStatistics(batch_results_df, tracker, attributes):
     sub_results_df = batch_results_df.loc[batch_results_df[0] == tracker]
     sub_results_in_attr_df = sub_results_df.loc[sub_results_df[1].isin(returnSubsetList(attributes))]
@@ -124,6 +128,18 @@ def getSubCategoryStatistics(batch_results_df, tracker, attributes):
     
 attr_list = ['bc','def','fm','ipr','iv', 'lr', 'mb', 
              'occ', 'opr', 'ov', 'sv']    
+attr_list_detail = ['Background Clutters',
+                    'Deformation',
+                    'Fast Motion',
+                    'In-Plane Rotation',
+                    'Illumination Variation',
+                    'Low Resolution',
+                    'Motion Blur',
+                    'Occlusion',
+                    'Out-of-Plane Rotation',
+                    'Out-of-View',
+                    'Scale Variation']
+attr_dictionary = dict(zip(attr_list, attr_list_detail))
 tracker_list = ['TrackerBoosting', 'TrackerCSRT', 'TrackerKCF', 'TrackerMedianFlow', 'TrackerMIL', 'TrackerMOSSE', 'TrackerTLD']
 results = [Path('result_batch_1').glob('*/'), 
            Path('result_batch_2').glob('*/'), 
@@ -131,6 +147,7 @@ results = [Path('result_batch_1').glob('*/'),
            Path('result_batch_4').glob('*/'),
            Path('result_batch_5').glob('*/')]
 
+# construct dataframe for plotting
 batch_results = []
 batch_results_df = pd.DataFrame()
 for pathlist in results:
@@ -151,35 +168,41 @@ for pathlist in results:
        
 fps_column = [2,4,6,8,10]
 batch_results_df[fps_column] = 1 / batch_results_df[fps_column] 
-#batch_results_df.to_csv('all_batch.csv',index=False)
 
-for tracker in tracker_list:
+# save dataframe to csv just in case
+batch_results_df.to_csv('all_batch.csv',index=False)
+
+# create plot for each tracker with respective CV problems
+for attribute in attr_list:
+
     f_sec_mean_list = []
     f_sec_std_list = []
     iou_mean_list = []
     iou_std_list = []
-    for attribute in attr_list:
+    for tracker in tracker_list:
         f_sec_mean, f_sec_std, iou_mean,iou_std = getSubCategoryStatistics(batch_results_df, tracker, attribute)
         f_sec_mean_list.append(f_sec_mean)
         f_sec_std_list.append(f_sec_std)
         iou_mean_list.append(iou_mean)
         iou_std_list.append(iou_std)
 
-
-    IOU_x_pos = np.arange(len(attr_list))
+    IOU_x_pos = np.arange(len(tracker_list))
     IOU = list(iou_mean_list)
     IOU_error = list(iou_std_list)
-    fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(8*1.618, 8))
     
     ax.bar(IOU_x_pos, IOU, yerr=IOU_error, align='center', alpha=0.5, ecolor='black', capsize=10)
     ax.set_ylabel('Intersection of Union')
     ax.set_xticks(IOU_x_pos)
-    ax.set_xticklabels(attr_list)
-    ax.set_title(str('Intersection of Union For ' + tracker) + ' By Categories')
+    ax.set_xticklabels(tracker_list,rotation=40, ha='right')
+    ax.set_title(str('Intersection of Union For ' + attr_dictionary[attribute] + ' Scenario') + ' By Tracker')
     ax.yaxis.grid(True)
+    handles, labels = ax.get_legend_handles_labels()
     
     # Save the figure and show
     plt.tight_layout()
+    plt.savefig(str(attribute + '_' + 'all_trackers'+ '.png'))    
     plt.show()        
+
         
         
