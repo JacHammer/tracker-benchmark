@@ -27,13 +27,27 @@ import glob
 #       be added.
 def BenchmarkingTracker(tracker, image_path, groundtruth_path, dataset_type):
     images = [cv2.imread(file) for file in glob.glob(image_path)]
-    images_coordinates = open(groundtruth_path, "r")
     
-    # TODO: prepare file to write stats
-    # f_to_write = open('test', 'a')
+
     n_image = len(images)
     sum_iou = 0.
     sum_fps = 0.
+
+    init_image = images[0]
+    with open(groundtruth_path, 'r') as f:
+        init_coord = f.readline().rstrip()
+        if ',' in init_coord:
+            init_coord = init_coord.split(",")
+        else:
+            init_coord = init_coord.split()
+            
+        init_coord = tuple(init_coord)
+        init_coord = tuple([int(v_ref) for v_ref in init_coord])       
+        
+
+    images_coordinates = open(groundtruth_path, "r")
+
+    tracker.init(init_image, init_coord)
     for image in images:
         
         # get width and height of images
@@ -52,7 +66,7 @@ def BenchmarkingTracker(tracker, image_path, groundtruth_path, dataset_type):
         coord = tuple([int(v_ref) for v_ref in coord])
 
         fps = FPS().start()  # initialize fps counter
-        tracker.init(image, coord)  # initialize the tracker
+          # initialize the tracker
         (success, box) = tracker.update(image)  # update tracker with new image
 
         if success:

@@ -1,12 +1,9 @@
 from pathlib import Path
 from tracker import BenchmarkingTracker
 import cv2
-
-
-
+import datetime
+import os
 OPENCV_OBJECT_TRACKERS = {
-
-
     "csrt": cv2.TrackerCSRT_create,
     "kcf": cv2.TrackerKCF_create,
     "boosting": cv2.TrackerBoosting_create,
@@ -15,6 +12,16 @@ OPENCV_OBJECT_TRACKERS = {
     "medianflow": cv2.TrackerMedianFlow_create,
     "mosse": cv2.TrackerMOSSE_create,
             }
+
+currentDT = datetime.datetime.now()
+time_str = currentDT.strftime("%Y%m%d%H%M%S")
+folder_str = str('result_batch_' + time_str)
+try: 
+    os.mkdir(folder_str)
+except OSError:
+    print('error creating directory')
+    exit()
+    
 source_path = Path("dataset/VTB")   
 
 # TODO: prepare file to write stats
@@ -23,7 +30,7 @@ for i in OPENCV_OBJECT_TRACKERS:
         tracker = OPENCV_OBJECT_TRACKERS[i]()
         tracker_name = str(tracker).split()[0][1:]
         
-        f_to_write = open(tracker_name, 'a')
+        f_to_write = open( str(folder_str + '/' + tracker_name), 'a')
         for a in abs_path.glob("*/*/"):
             if a.is_dir():
                 img_dir = str(a) + "\*jpg"

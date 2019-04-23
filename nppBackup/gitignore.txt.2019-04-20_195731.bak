@@ -121,16 +121,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# datasets for the project
-/dataset
-*.zip
-*.jpg
-*.mp4
-
-# model for goturn tracker
-*.prototxt
-*.caffemodel
-
-# notepad++ backup file
-*/nppBackup
